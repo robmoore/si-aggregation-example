@@ -11,6 +11,7 @@ buildscript {
 }
 
 apply plugin: 'java'
+apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
 
 group = 'org.sdf.rkm'
@@ -26,7 +27,8 @@ dependencies {
 	compile('org.springframework.boot:spring-boot-starter-amqp')
 	compile('org.springframework.boot:spring-boot-starter-integration')
 	compile('org.springframework.boot:spring-boot-starter-web')
-	compile('org.springframework.integration:spring-integration-amqp')
+    compile('org.springframework.boot:spring-boot-starter-data-redis')
+    compile('org.springframework.integration:spring-integration-amqp')
 	compile('org.springframework.integration:spring-integration-http')
     compile('org.springframework.integration:spring-integration-redis')
     compile('org.springframework.boot:spring-boot-devtools')

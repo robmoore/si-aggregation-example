@@ -8,16 +8,17 @@ import org.springframework.amqp.core.QueueBuilder;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.http.MediaType;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.dsl.amqp.Amqp;
 import org.springframework.integration.dsl.http.Http;
 import org.springframework.integration.dsl.support.Transformers;
+import org.springframework.integration.redis.store.RedisMessageStore;
+import org.springframework.integration.redis.util.RedisLockRegistry;
 import org.springframework.integration.store.MessageGroupStore;
 import org.springframework.integration.store.MessageGroupStoreReaper;
-import org.springframework.integration.store.SimpleMessageStore;
-import org.springframework.integration.support.locks.DefaultLockRegistry;
 import org.springframework.integration.support.locks.LockRegistry;
 import org.springframework.web.client.RestTemplate;
 
@@ -33,7 +34,7 @@ public class PipelineConfig {
     public IntegrationFlow timeRequestHttpInboundGatewayFlow(AmqpTemplate amqpTemplate) {
         return IntegrationFlows.from(Http.inboundChannelAdapter("/start"))
                 .log()
-                .handle((payload, headers) -> IntStream.range(1, 50).boxed().collect(Collectors.toSet()))
+                .handle((payload, headers) -> IntStream.range(1, 25).boxed().collect(Collectors.toSet()))
                 .split()
                 .handle(Amqp.outboundAdapter(amqpTemplate).routingKey(timeQueryQueue().getName()))
                 .get();
@@ -46,7 +47,7 @@ public class PipelineConfig {
         return IntegrationFlows.from(Amqp.inboundAdapter(connectionFactory, timeQueryQueue()))
                 .log()
                 .handle((payload, headers) -> {
-                    int delay = ThreadLocalRandom.current().nextInt(1000, 5000);
+                    int delay = ThreadLocalRandom.current().nextInt(1000, 10000);
                     try {
                         Thread.sleep(delay);
                     } catch (InterruptedException e) {
@@ -81,13 +82,15 @@ public class PipelineConfig {
     }
 
     @Bean
-    public MessageGroupStore messageGroupStore() {
-        return new SimpleMessageStore();
+    public MessageGroupStore messageGroupStore(RedisConnectionFactory redisConnectionFactory) {
+        //return new SimpleMessageStore();
+        return new RedisMessageStore(redisConnectionFactory, "time-query-msg"); //redisMessageStore;
     }
 
     @Bean
-    public LockRegistry lockRegistry() {
-        return new DefaultLockRegistry();
+    public LockRegistry lockRegistry(RedisConnectionFactory redisConnectionFactory) {
+        //return new DefaultLockRegistry();
+        return new RedisLockRegistry(redisConnectionFactory, "time-query-lock");
     }
 
     @Bean
