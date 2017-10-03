@@ -63,7 +63,7 @@ public class PipelineConfig {
                     Double epochSecondAverage = zonedDateTimes.stream()
                             .collect(Collectors.averagingLong(ZonedDateTime::toEpochSecond));
                     return zonedDateTimes.stream().map(zonedDateTime -> new TimeDiff(zonedDateTime.toEpochSecond(),
-                            epochSecondAverage)).collect(Collectors.toList());
+                            zonedDateTime.toEpochSecond() - epochSecondAverage)).collect(Collectors.toList());
                 })
                 .split()
                 .handle(Amqp.outboundAdapter(amqpTemplate).routingKey(timeNotifyQueue().getName()))
