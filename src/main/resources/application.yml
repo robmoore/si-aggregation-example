@@ -1,0 +1,5 @@
+trace: false
+logging:
+  level:
+       org.springframework.integration: TRACE
+       org.springframework.web.client.RestTemplate: DEBUG
