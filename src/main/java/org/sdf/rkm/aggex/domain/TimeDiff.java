@@ -3,6 +3,7 @@ package org.sdf.rkm.aggex.domain;
 import java.io.Serializable;
 
 public class TimeDiff implements Serializable {
+    private static final long serialVersionUID = -590648871366448251L;
     private long epochSeconds;
     private double differenceFromAverage;
 

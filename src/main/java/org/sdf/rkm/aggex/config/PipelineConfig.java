@@ -34,7 +34,7 @@ public class PipelineConfig {
     public IntegrationFlow timeRequestHttpInboundGatewayFlow(AmqpTemplate amqpTemplate) {
         return IntegrationFlows.from(Http.inboundChannelAdapter("/start"))
                 .log()
-                .handle((payload, headers) -> IntStream.range(1, 25).boxed().collect(Collectors.toSet()))
+                .handle((payload, headers) -> IntStream.range(1, 11).boxed().collect(Collectors.toSet()))
                 .split()
                 .handle(Amqp.outboundAdapter(amqpTemplate).routingKey(timeQueryQueue().getName()))
                 .get();
@@ -84,13 +84,13 @@ public class PipelineConfig {
     @Bean
     public MessageGroupStore messageGroupStore(RedisConnectionFactory redisConnectionFactory) {
         //return new SimpleMessageStore();
-        return new RedisMessageStore(redisConnectionFactory, "time-query-msg"); //redisMessageStore;
+        return new RedisMessageStore(redisConnectionFactory, "time-query-msg_"); //redisMessageStore;
     }
 
     @Bean
     public LockRegistry lockRegistry(RedisConnectionFactory redisConnectionFactory) {
         //return new DefaultLockRegistry();
-        return new RedisLockRegistry(redisConnectionFactory, "time-query-lock");
+        return new RedisLockRegistry(redisConnectionFactory, "time-query-lock_");
     }
 
     @Bean

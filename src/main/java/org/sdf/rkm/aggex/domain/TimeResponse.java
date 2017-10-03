@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 public class TimeResponse implements Serializable {
+    private static final long serialVersionUID = -7236011838695272562L;
     private Map<String, Object> now;
     private List<String> urls;
 
